@@ -19,3 +19,7 @@ func (s *SliceFloat32) Delete(i int) {
 	*s = (*s)[:end]
 }
 
+func (s *SliceFloat32) Append(t interface{}) {
+	f, _ := t.(float32)
+	*s = append(*s, f)
+}

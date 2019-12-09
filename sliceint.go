@@ -19,3 +19,8 @@ func (s *SliceInt) Delete(i int) {
 	*s = (*s)[:end]
 }
 
+func (s *SliceInt) Append(t interface{}) {
+	i, _ := t.(int)
+	*s = append(*s, i)
+}
+

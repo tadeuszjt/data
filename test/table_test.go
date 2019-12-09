@@ -2,24 +2,24 @@ package dataTest
 
 import (
 	"testing"
-	"github.com/tadeuszjt/data"
+	. "github.com/tadeuszjt/data"
 )
 
-func tableIdentical(a, b data.Table) bool {
+func tableIdentical(a, b Table) bool {
 	if len(a) != len(b) {
 		return false
 	}
 	
 	for i := range a {
 		switch sa := a[i].(type) {
-			case *data.SliceInt:
-				sb, ok := b[i].(*data.SliceInt)
+			case *SliceInt:
+				sb, ok := b[i].(*SliceInt)
 				if !ok || !sliceIntIdentical(*sa, *sb) {
 					return false
 				}
 				
-			case *data.SliceFloat32:
-				sb, ok := b[i].(*data.SliceFloat32)
+			case *SliceFloat32:
+				sb, ok := b[i].(*SliceFloat32)
 				if !ok || !sliceFloat32Identical(*sa, *sb) {
 					return false
 				}
@@ -34,58 +34,58 @@ func tableIdentical(a, b data.Table) bool {
 
 func TestTableIdentical(t *testing.T) {
 	cases := []struct{
-		a, b   data.Table
+		a, b   Table
 		result bool
 	}{
 		{
-			data.Table{},
-			data.Table{},
+			Table{},
+			Table{},
 			true,
 		},
 		{
-			data.Table{},
-			data.Table{ &data.SliceInt{} },
+			Table{},
+			Table{ &SliceInt{} },
 			false,
 		},
 		{
-			data.Table{ &data.SliceInt{} },
-			data.Table{ &data.SliceInt{} },
+			Table{ &SliceInt{} },
+			Table{ &SliceInt{} },
 			true,
 		},
 		{
-			data.Table{ &data.SliceFloat32{} },
-			data.Table{ &data.SliceInt{} },
+			Table{ &SliceFloat32{} },
+			Table{ &SliceInt{} },
 			false,
 		},
 		{
-			data.Table{ &data.SliceInt{1, 2, 3} },
-			data.Table{ &data.SliceInt{1, 2, 3} },
+			Table{ &SliceInt{1, 2, 3} },
+			Table{ &SliceInt{1, 2, 3} },
 			true,
 		},
 		{
-			data.Table{ &data.SliceInt{1, 2, 3} },
-			data.Table{ &data.SliceInt{1, 2, 4} },
+			Table{ &SliceInt{1, 2, 3} },
+			Table{ &SliceInt{1, 2, 4} },
 			false,
 		},
 		{
-			data.Table{
-				&data.SliceInt{1, 2, 3},
-				&data.SliceFloat32{1, 2, 3},
+			Table{
+				&SliceInt{1, 2, 3},
+				&SliceFloat32{1, 2, 3},
 			},
-			data.Table{
-				&data.SliceInt{1, 2, 3},
-				&data.SliceFloat32{1, 2, 3},
+			Table{
+				&SliceInt{1, 2, 3},
+				&SliceFloat32{1, 2, 3},
 			},
 			true,
 		},
 		{
-			data.Table{
-				&data.SliceInt{1, 2, 3},
-				&data.SliceFloat32{1, 2, 3},
+			Table{
+				&SliceInt{1, 2, 3},
+				&SliceFloat32{1, 2, 3},
 			},
-			data.Table{
-				&data.SliceInt{1, 2, 3},
-				&data.SliceFloat32{1, 2, 3.1},
+			Table{
+				&SliceInt{1, 2, 3},
+				&SliceFloat32{1, 2, 3.1},
 			},
 			false,
 		},
@@ -102,21 +102,21 @@ func TestTableIdentical(t *testing.T) {
 
 func TestTableLen(t *testing.T) {
 	cases := []struct{
-		table  data.Table
+		table  Table
 		result int
 	}{
 		{
-			data.Table{ &data.SliceInt{} },
+			Table{ &SliceInt{} },
 			0,
 		},
 		{
-			data.Table{ &data.SliceInt{1, 2, 3} },
+			Table{ &SliceInt{1, 2, 3} },
 			3,
 		},
 		{
-			data.Table{
-				&data.SliceInt{1, 2, 3},
-				&data.SliceFloat32{1, 2, 3},
+			Table{
+				&SliceInt{1, 2, 3},
+				&SliceFloat32{1, 2, 3},
 			},
 			3,
 		},
@@ -134,33 +134,33 @@ func TestTableLen(t *testing.T) {
 func TestTableSwap(t *testing.T) {
 	cases := []struct{
 		i, j   int
-		table  data.Table
-		result data.Table
+		table  Table
+		result Table
 	}{
 		{
 			0, 0,
-			data.Table{},
-			data.Table{},
+			Table{},
+			Table{},
 		},
 		{
 			0, 0,
-			data.Table{ &data.SliceInt{1} },
-			data.Table{ &data.SliceInt{1} },
+			Table{ &SliceInt{1} },
+			Table{ &SliceInt{1} },
 		},
 		{
 			1, 3,
-			data.Table{ &data.SliceInt{1, 2, 3, 4} },
-			data.Table{ &data.SliceInt{1, 4, 3, 2} },
+			Table{ &SliceInt{1, 2, 3, 4} },
+			Table{ &SliceInt{1, 4, 3, 2} },
 		},
 		{
 			2, 0,
-			data.Table{
-				&data.SliceInt{1, 2, 3, 4},
-				&data.SliceFloat32{.1, .2, .3, .4},
+			Table{
+				&SliceInt{1, 2, 3, 4},
+				&SliceFloat32{.1, .2, .3, .4},
 			},
-			data.Table{
-				&data.SliceInt{3, 2, 1, 4},
-				&data.SliceFloat32{.3, .2, .1, .4},
+			Table{
+				&SliceInt{3, 2, 1, 4},
+				&SliceFloat32{.3, .2, .1, .4},
 			},
 		},
 	}
@@ -178,45 +178,45 @@ func TestTableSwap(t *testing.T) {
 func TestTableDelete(t *testing.T) {
 	cases := []struct{
 		i      int
-		table  data.Table
-		result data.Table
+		table  Table
+		result Table
 	}{
 		{
 			0,
-			data.Table{},
-			data.Table{},
+			Table{},
+			Table{},
 		},
 		{
 			0,
-			data.Table{
-				&data.SliceInt{1, 2, 3, 4},
-				&data.SliceFloat32{1, 2, 3, 4},
+			Table{
+				&SliceInt{1, 2, 3, 4},
+				&SliceFloat32{1, 2, 3, 4},
 			},
-			data.Table{
-				&data.SliceInt{4, 2, 3},
-				&data.SliceFloat32{4, 2, 3},
+			Table{
+				&SliceInt{4, 2, 3},
+				&SliceFloat32{4, 2, 3},
 			},
 		},
 		{
 			1,
-			data.Table{
-				&data.SliceInt{1, 2, 3, 4},
-				&data.SliceFloat32{1, 2, 3, 4},
+			Table{
+				&SliceInt{1, 2, 3, 4},
+				&SliceFloat32{1, 2, 3, 4},
 			},
-			data.Table{
-				&data.SliceInt{1, 4, 3},
-				&data.SliceFloat32{1, 4, 3},
+			Table{
+				&SliceInt{1, 4, 3},
+				&SliceFloat32{1, 4, 3},
 			},
 		},
 		{
 			3,
-			data.Table{
-				&data.SliceInt{1, 2, 3, 4},
-				&data.SliceFloat32{1, 2, 3, 4},
+			Table{
+				&SliceInt{1, 2, 3, 4},
+				&SliceFloat32{1, 2, 3, 4},
 			},
-			data.Table{
-				&data.SliceInt{1, 2, 3},
-				&data.SliceFloat32{1, 2, 3},
+			Table{
+				&SliceInt{1, 2, 3},
+				&SliceFloat32{1, 2, 3},
 			},
 		},
 	}
