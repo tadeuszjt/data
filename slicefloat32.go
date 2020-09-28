@@ -20,6 +20,10 @@ func (s *SliceFloat32) Delete(i int) {
 }
 
 func (s *SliceFloat32) Append(t interface{}) {
-	f, _ := t.(float32)
+	f, ok := t.(float32)
+	if !ok {
+		panic("wrong type")
+	}
+	
 	*s = append(*s, f)
 }

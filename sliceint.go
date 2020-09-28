@@ -20,7 +20,11 @@ func (s *SliceInt) Delete(i int) {
 }
 
 func (s *SliceInt) Append(t interface{}) {
-	i, _ := t.(int)
+	i, ok := t.(int)
+	if !ok {
+		panic("wrong type")
+	}
+	
 	*s = append(*s, i)
 }
 

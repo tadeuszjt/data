@@ -121,3 +121,23 @@ func TestSliceFloat32Delete(t *testing.T) {
 	}
 }
 
+func TestSliceFloat32Append(t *testing.T) {
+	cases := []struct{
+        f      float32
+		slice  data.SliceFloat32
+		result data.SliceFloat32
+	}{
+		{0.1, data.SliceFloat32{}, data.SliceFloat32{0.1}},
+		{0.2, data.SliceFloat32{1.0}, data.SliceFloat32{1.0, 0.2}},
+		{0.3, data.SliceFloat32{1.0, 2.0, 3.0}, data.SliceFloat32{1.0, 2.0, 3.0, 0.3}},
+	}
+	
+	for _, c := range cases {
+		expected := c.result
+		c.slice.Append(c.f)
+		actual := c.slice
+		if !sliceFloat32Identical(expected, actual) {
+			t.Errorf("expected: %v, actual: %v", expected, actual)
+		}
+	}
+}
