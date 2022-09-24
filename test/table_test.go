@@ -12,14 +12,14 @@ func tableIdentical(a, b Table) bool {
 	
 	for i := range a {
 		switch sa := a[i].(type) {
-			case *SliceInt:
-				sb, ok := b[i].(*SliceInt)
+			case *SliceT[int]:
+				sb, ok := b[i].(*SliceT[int])
 				if !ok || !sliceIntIdentical(*sa, *sb) {
 					return false
 				}
 				
-			case *SliceFloat32:
-				sb, ok := b[i].(*SliceFloat32)
+			case *SliceT[float32]:
+				sb, ok := b[i].(*SliceT[float32])
 				if !ok || !sliceFloat32Identical(*sa, *sb) {
 					return false
 				}
@@ -44,48 +44,48 @@ func TestTableIdentical(t *testing.T) {
 		},
 		{
 			Table{},
-			Table{ &SliceInt{} },
+			Table{ &SliceT[int]{} },
 			false,
 		},
 		{
-			Table{ &SliceInt{} },
-			Table{ &SliceInt{} },
+			Table{ &SliceT[int]{} },
+			Table{ &SliceT[int]{} },
 			true,
 		},
 		{
-			Table{ &SliceFloat32{} },
-			Table{ &SliceInt{} },
+			Table{ &SliceT[float32]{} },
+			Table{ &SliceT[int]{} },
 			false,
 		},
 		{
-			Table{ &SliceInt{1, 2, 3} },
-			Table{ &SliceInt{1, 2, 3} },
+			Table{ &SliceT[int]{1, 2, 3} },
+			Table{ &SliceT[int]{1, 2, 3} },
 			true,
 		},
 		{
-			Table{ &SliceInt{1, 2, 3} },
-			Table{ &SliceInt{1, 2, 4} },
+			Table{ &SliceT[int]{1, 2, 3} },
+			Table{ &SliceT[int]{1, 2, 4} },
 			false,
 		},
 		{
 			Table{
-				&SliceInt{1, 2, 3},
-				&SliceFloat32{1, 2, 3},
+				&SliceT[int]{1, 2, 3},
+				&SliceT[float32]{1, 2, 3},
 			},
 			Table{
-				&SliceInt{1, 2, 3},
-				&SliceFloat32{1, 2, 3},
+				&SliceT[int]{1, 2, 3},
+				&SliceT[float32]{1, 2, 3},
 			},
 			true,
 		},
 		{
 			Table{
-				&SliceInt{1, 2, 3},
-				&SliceFloat32{1, 2, 3},
+				&SliceT[int]{1, 2, 3},
+				&SliceT[float32]{1, 2, 3},
 			},
 			Table{
-				&SliceInt{1, 2, 3},
-				&SliceFloat32{1, 2, 3.1},
+				&SliceT[int]{1, 2, 3},
+				&SliceT[float32]{1, 2, 3.1},
 			},
 			false,
 		},
@@ -106,17 +106,17 @@ func TestTableLen(t *testing.T) {
 		result int
 	}{
 		{
-			Table{ &SliceInt{} },
+			Table{ &SliceT[int]{} },
 			0,
 		},
 		{
-			Table{ &SliceInt{1, 2, 3} },
+			Table{ &SliceT[int]{1, 2, 3} },
 			3,
 		},
 		{
 			Table{
-				&SliceInt{1, 2, 3},
-				&SliceFloat32{1, 2, 3},
+				&SliceT[int]{1, 2, 3},
+				&SliceT[float32]{1, 2, 3},
 			},
 			3,
 		},
@@ -144,23 +144,23 @@ func TestTableSwap(t *testing.T) {
 		},
 		{
 			0, 0,
-			Table{ &SliceInt{1} },
-			Table{ &SliceInt{1} },
+			Table{ &SliceT[int]{1} },
+			Table{ &SliceT[int]{1} },
 		},
 		{
 			1, 3,
-			Table{ &SliceInt{1, 2, 3, 4} },
-			Table{ &SliceInt{1, 4, 3, 2} },
+			Table{ &SliceT[int]{1, 2, 3, 4} },
+			Table{ &SliceT[int]{1, 4, 3, 2} },
 		},
 		{
 			2, 0,
 			Table{
-				&SliceInt{1, 2, 3, 4},
-				&SliceFloat32{.1, .2, .3, .4},
+				&SliceT[int]{1, 2, 3, 4},
+				&SliceT[float32]{.1, .2, .3, .4},
 			},
 			Table{
-				&SliceInt{3, 2, 1, 4},
-				&SliceFloat32{.3, .2, .1, .4},
+				&SliceT[int]{3, 2, 1, 4},
+				&SliceT[float32]{.3, .2, .1, .4},
 			},
 		},
 	}
@@ -189,34 +189,34 @@ func TestTableDelete(t *testing.T) {
 		{
 			0,
 			Table{
-				&SliceInt{1, 2, 3, 4},
-				&SliceFloat32{1, 2, 3, 4},
+				&SliceT[int]{1, 2, 3, 4},
+				&SliceT[float32]{1, 2, 3, 4},
 			},
 			Table{
-				&SliceInt{4, 2, 3},
-				&SliceFloat32{4, 2, 3},
+				&SliceT[int]{4, 2, 3},
+				&SliceT[float32]{4, 2, 3},
 			},
 		},
 		{
 			1,
 			Table{
-				&SliceInt{1, 2, 3, 4},
-				&SliceFloat32{1, 2, 3, 4},
+				&SliceT[int]{1, 2, 3, 4},
+				&SliceT[float32]{1, 2, 3, 4},
 			},
 			Table{
-				&SliceInt{1, 4, 3},
-				&SliceFloat32{1, 4, 3},
+				&SliceT[int]{1, 4, 3},
+				&SliceT[float32]{1, 4, 3},
 			},
 		},
 		{
 			3,
 			Table{
-				&SliceInt{1, 2, 3, 4},
-				&SliceFloat32{1, 2, 3, 4},
+				&SliceT[int]{1, 2, 3, 4},
+				&SliceT[float32]{1, 2, 3, 4},
 			},
 			Table{
-				&SliceInt{1, 2, 3},
-				&SliceFloat32{1, 2, 3},
+				&SliceT[int]{1, 2, 3},
+				&SliceT[float32]{1, 2, 3},
 			},
 		},
 	}

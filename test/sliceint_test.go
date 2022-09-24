@@ -5,7 +5,7 @@ import (
 	"github.com/tadeuszjt/data"
 )
 
-func sliceIntIdentical(a, b data.SliceInt) bool {
+func sliceIntIdentical(a, b data.SliceT[int]) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -21,27 +21,27 @@ func sliceIntIdentical(a, b data.SliceInt) bool {
 
 func TestSliceIntIdentical(t *testing.T) {
 	cases := []struct{
-		a, b   data.SliceInt
+		a, b   data.SliceT[int]
 		result bool
 	}{
 		{
-			data.SliceInt{},
-			data.SliceInt{},
+			data.SliceT[int]{},
+			data.SliceT[int]{},
 			true,
 		},
 		{
-			data.SliceInt{12},
-			data.SliceInt{},
+			data.SliceT[int]{12},
+			data.SliceT[int]{},
 			false,
 		},
 		{
-			data.SliceInt{1, 2, 3, 4},
-			data.SliceInt{1, 2, 3, 4},
+			data.SliceT[int]{1, 2, 3, 4},
+			data.SliceT[int]{1, 2, 3, 4},
 			true,
 		},
 		{
-			data.SliceInt{1, 2, 3, 4},
-			data.SliceInt{1, 2, 4, 4},
+			data.SliceT[int]{1, 2, 3, 4},
+			data.SliceT[int]{1, 2, 4, 4},
 			false,
 		},
 	}
@@ -57,11 +57,11 @@ func TestSliceIntIdentical(t *testing.T) {
 
 func TestSliceIntLen(t *testing.T) {
 	cases := []struct{
-		slice  data.SliceInt
+		slice  data.SliceT[int]
 		result int
 	}{
-		{data.SliceInt{}, 0},
-		{data.SliceInt{1, 2, 3}, 3},
+		{data.SliceT[int]{}, 0},
+		{data.SliceT[int]{1, 2, 3}, 3},
 		{nil, 0},
 	}
 	
@@ -77,14 +77,14 @@ func TestSliceIntLen(t *testing.T) {
 func TestSliceIntSwap(t *testing.T) {
 	cases := []struct{
 		i, j   int
-		slice  data.SliceInt
-		result data.SliceInt
+		slice  data.SliceT[int]
+		result data.SliceT[int]
 	}{
-		{0, 0, data.SliceInt{1}, data.SliceInt{1}},
-		{0, 1, data.SliceInt{1, 2}, data.SliceInt{2, 1}},
-		{1, 1, data.SliceInt{1, 2}, data.SliceInt{1, 2}},
-		{1, 2, data.SliceInt{1, 2, 3, 4}, data.SliceInt{1, 3, 2, 4}},
-		{3, 0, data.SliceInt{1, 2, 3, 4}, data.SliceInt{4, 2, 3, 1}},
+		{0, 0, data.SliceT[int]{1}, data.SliceT[int]{1}},
+		{0, 1, data.SliceT[int]{1, 2}, data.SliceT[int]{2, 1}},
+		{1, 1, data.SliceT[int]{1, 2}, data.SliceT[int]{1, 2}},
+		{1, 2, data.SliceT[int]{1, 2, 3, 4}, data.SliceT[int]{1, 3, 2, 4}},
+		{3, 0, data.SliceT[int]{1, 2, 3, 4}, data.SliceT[int]{4, 2, 3, 1}},
 	}
 	
 	for _, c := range cases {
@@ -100,14 +100,14 @@ func TestSliceIntSwap(t *testing.T) {
 func TestSliceIntDelete(t *testing.T) {
 	cases := []struct{
 		i      int
-		slice  data.SliceInt
-		result data.SliceInt
+		slice  data.SliceT[int]
+		result data.SliceT[int]
 	}{
-		{0, data.SliceInt{1}, data.SliceInt{}},
-		{1, data.SliceInt{1, 2, 3}, data.SliceInt{1, 3}},
-		{1, data.SliceInt{1, 2, 3, 4}, data.SliceInt{1, 4, 3}},
-		{3, data.SliceInt{1, 2, 3, 4}, data.SliceInt{1, 2, 3}},
-		{0, data.SliceInt{1, 2, 3, 4}, data.SliceInt{4, 2, 3}},
+		{0, data.SliceT[int]{1}, data.SliceT[int]{}},
+		{1, data.SliceT[int]{1, 2, 3}, data.SliceT[int]{1, 3}},
+		{1, data.SliceT[int]{1, 2, 3, 4}, data.SliceT[int]{1, 4, 3}},
+		{3, data.SliceT[int]{1, 2, 3, 4}, data.SliceT[int]{1, 2, 3}},
+		{0, data.SliceT[int]{1, 2, 3, 4}, data.SliceT[int]{4, 2, 3}},
 	}
 	
 	for _, c := range cases {

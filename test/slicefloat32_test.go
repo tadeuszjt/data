@@ -5,7 +5,7 @@ import (
 	"github.com/tadeuszjt/data"
 )
 
-func sliceFloat32Identical(a, b data.SliceFloat32) bool {
+func sliceFloat32Identical(a, b data.SliceT[float32]) bool {
 	if len(a) != len(b) {
 		return false
 	}
@@ -21,27 +21,27 @@ func sliceFloat32Identical(a, b data.SliceFloat32) bool {
 
 func TestSliceFloat32Identical(t *testing.T) {
 	cases := []struct{
-		a, b   data.SliceFloat32
+		a, b   data.SliceT[float32]
 		result bool
 	}{
 		{
-			data.SliceFloat32{},
-			data.SliceFloat32{},
+			data.SliceT[float32]{},
+			data.SliceT[float32]{},
 			true,
 		},
 		{
-			data.SliceFloat32{12},
-			data.SliceFloat32{},
+			data.SliceT[float32]{12},
+			data.SliceT[float32]{},
 			false,
 		},
 		{
-			data.SliceFloat32{1, 2, 3, 4},
-			data.SliceFloat32{1, 2, 3, 4},
+			data.SliceT[float32]{1, 2, 3, 4},
+			data.SliceT[float32]{1, 2, 3, 4},
 			true,
 		},
 		{
-			data.SliceFloat32{1, 2, 3, 4},
-			data.SliceFloat32{1, 2, 4, 4},
+			data.SliceT[float32]{1, 2, 3, 4},
+			data.SliceT[float32]{1, 2, 4, 4},
 			false,
 		},
 	}
@@ -58,11 +58,11 @@ func TestSliceFloat32Identical(t *testing.T) {
 
 func TestSliceFloat32Len(t *testing.T) {
 	cases := []struct{
-		slice  data.SliceFloat32
+		slice  data.SliceT[float32]
 		result int
 	}{
-		{data.SliceFloat32{}, 0},
-		{data.SliceFloat32{1, 2, 3}, 3},
+		{data.SliceT[float32]{}, 0},
+		{data.SliceT[float32]{1, 2, 3}, 3},
 		{nil, 0},
 	}
 	
@@ -78,14 +78,14 @@ func TestSliceFloat32Len(t *testing.T) {
 func TestSliceFloat32Swap(t *testing.T) {
 	cases := []struct{
 		i, j   int
-		slice  data.SliceFloat32
-		result data.SliceFloat32
+		slice  data.SliceT[float32]
+		result data.SliceT[float32]
 	}{
-		{0, 0, data.SliceFloat32{1}, data.SliceFloat32{1}},
-		{0, 1, data.SliceFloat32{1, 2}, data.SliceFloat32{2, 1}},
-		{1, 1, data.SliceFloat32{1, 2}, data.SliceFloat32{1, 2}},
-		{1, 2, data.SliceFloat32{1, 2, 3, 4}, data.SliceFloat32{1, 3, 2, 4}},
-		{3, 0, data.SliceFloat32{1, 2, 3, 4}, data.SliceFloat32{4, 2, 3, 1}},
+		{0, 0, data.SliceT[float32]{1}, data.SliceT[float32]{1}},
+		{0, 1, data.SliceT[float32]{1, 2}, data.SliceT[float32]{2, 1}},
+		{1, 1, data.SliceT[float32]{1, 2}, data.SliceT[float32]{1, 2}},
+		{1, 2, data.SliceT[float32]{1, 2, 3, 4}, data.SliceT[float32]{1, 3, 2, 4}},
+		{3, 0, data.SliceT[float32]{1, 2, 3, 4}, data.SliceT[float32]{4, 2, 3, 1}},
 	}
 	
 	for _, c := range cases {
@@ -101,14 +101,14 @@ func TestSliceFloat32Swap(t *testing.T) {
 func TestSliceFloat32Delete(t *testing.T) {
 	cases := []struct{
 		i      int
-		slice  data.SliceFloat32
-		result data.SliceFloat32
+		slice  data.SliceT[float32]
+		result data.SliceT[float32]
 	}{
-		{0, data.SliceFloat32{1}, data.SliceFloat32{}},
-		{1, data.SliceFloat32{1, 2, 3}, data.SliceFloat32{1, 3}},
-		{1, data.SliceFloat32{1, 2, 3, 4}, data.SliceFloat32{1, 4, 3}},
-		{3, data.SliceFloat32{1, 2, 3, 4}, data.SliceFloat32{1, 2, 3}},
-		{0, data.SliceFloat32{1, 2, 3, 4}, data.SliceFloat32{4, 2, 3}},
+		{0, data.SliceT[float32]{1}, data.SliceT[float32]{}},
+		{1, data.SliceT[float32]{1, 2, 3}, data.SliceT[float32]{1, 3}},
+		{1, data.SliceT[float32]{1, 2, 3, 4}, data.SliceT[float32]{1, 4, 3}},
+		{3, data.SliceT[float32]{1, 2, 3, 4}, data.SliceT[float32]{1, 2, 3}},
+		{0, data.SliceT[float32]{1, 2, 3, 4}, data.SliceT[float32]{4, 2, 3}},
 	}
 	
 	for _, c := range cases {
@@ -124,12 +124,12 @@ func TestSliceFloat32Delete(t *testing.T) {
 func TestSliceFloat32Append(t *testing.T) {
 	cases := []struct{
         f      float32
-		slice  data.SliceFloat32
-		result data.SliceFloat32
+		slice  data.SliceT[float32]
+		result data.SliceT[float32]
 	}{
-		{0.1, data.SliceFloat32{}, data.SliceFloat32{0.1}},
-		{0.2, data.SliceFloat32{1.0}, data.SliceFloat32{1.0, 0.2}},
-		{0.3, data.SliceFloat32{1.0, 2.0, 3.0}, data.SliceFloat32{1.0, 2.0, 3.0, 0.3}},
+		{0.1, data.SliceT[float32]{}, data.SliceT[float32]{0.1}},
+		{0.2, data.SliceT[float32]{1.0}, data.SliceT[float32]{1.0, 0.2}},
+		{0.3, data.SliceT[float32]{1.0, 2.0, 3.0}, data.SliceT[float32]{1.0, 2.0, 3.0, 0.3}},
 	}
 	
 	for _, c := range cases {

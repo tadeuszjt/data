@@ -7,7 +7,7 @@ import (
 
 func BenchmarkTableLen(b *testing.B) {
 	table := Table{
-		&SliceInt{1, 2, 3, 4},
+		&SliceT[int]{1, 2, 3, 4},
 	}
 	
 	for i := 0; i < b.N; i++ {
@@ -17,7 +17,7 @@ func BenchmarkTableLen(b *testing.B) {
 
 func BenchmarkTableSwap(b *testing.B) {
 	table := Table{
-		&SliceInt{1, 2, 3, 4, 5, 6},
+		&SliceT[int]{1, 2, 3, 4, 5, 6},
 	}
 	
 	for i := 0; i < b.N; i++ {
@@ -26,8 +26,8 @@ func BenchmarkTableSwap(b *testing.B) {
 }
 
 func BenchmarkTableDelete(b *testing.B) {
-	slice := SliceInt{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
-	var slice2 SliceInt = slice[:]
+	slice := SliceT[int]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+	var slice2 SliceT[int] = slice[:]
 	table := Table{ &slice2 }
 	
 	for i := 0; i < b.N; i++ {
