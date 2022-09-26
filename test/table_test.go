@@ -1,39 +1,39 @@
 package dataTest
 
 import (
-	"testing"
 	. "github.com/tadeuszjt/data"
+	"testing"
 )
 
 func tableIdentical(a, b Table) bool {
 	if len(a) != len(b) {
 		return false
 	}
-	
+
 	for i := range a {
 		switch sa := a[i].(type) {
-			case *RowT[int]:
-				sb, ok := b[i].(*RowT[int])
-				if !ok || !rowIntIdentical(*sa, *sb) {
-					return false
-				}
-				
-			case *RowT[float32]:
-				sb, ok := b[i].(*RowT[float32])
-				if !ok || !rowFloat32Identical(*sa, *sb) {
-					return false
-				}
-				
-			default:
-				panic("testRowIntIdentical: unrecognised row type")
+		case *RowT[int]:
+			sb, ok := b[i].(*RowT[int])
+			if !ok || !rowIntIdentical(*sa, *sb) {
+				return false
+			}
+
+		case *RowT[float32]:
+			sb, ok := b[i].(*RowT[float32])
+			if !ok || !rowFloat32Identical(*sa, *sb) {
+				return false
+			}
+
+		default:
+			panic("testRowIntIdentical: unrecognised row type")
 		}
 	}
-	
+
 	return true
 }
 
 func TestTableIdentical(t *testing.T) {
-	cases := []struct{
+	cases := []struct {
 		a, b   Table
 		result bool
 	}{
@@ -44,27 +44,27 @@ func TestTableIdentical(t *testing.T) {
 		},
 		{
 			Table{},
-			Table{ &RowT[int]{} },
+			Table{&RowT[int]{}},
 			false,
 		},
 		{
-			Table{ &RowT[int]{} },
-			Table{ &RowT[int]{} },
+			Table{&RowT[int]{}},
+			Table{&RowT[int]{}},
 			true,
 		},
 		{
-			Table{ &RowT[float32]{} },
-			Table{ &RowT[int]{} },
+			Table{&RowT[float32]{}},
+			Table{&RowT[int]{}},
 			false,
 		},
 		{
-			Table{ &RowT[int]{1, 2, 3} },
-			Table{ &RowT[int]{1, 2, 3} },
+			Table{&RowT[int]{1, 2, 3}},
+			Table{&RowT[int]{1, 2, 3}},
 			true,
 		},
 		{
-			Table{ &RowT[int]{1, 2, 3} },
-			Table{ &RowT[int]{1, 2, 4} },
+			Table{&RowT[int]{1, 2, 3}},
+			Table{&RowT[int]{1, 2, 4}},
 			false,
 		},
 		{
@@ -90,7 +90,7 @@ func TestTableIdentical(t *testing.T) {
 			false,
 		},
 	}
-	
+
 	for _, c := range cases {
 		expected := c.result
 		actual := tableIdentical(c.a, c.b)
@@ -101,16 +101,16 @@ func TestTableIdentical(t *testing.T) {
 }
 
 func TestTableLen(t *testing.T) {
-	cases := []struct{
+	cases := []struct {
 		table  Table
 		result int
 	}{
 		{
-			Table{ &RowT[int]{} },
+			Table{&RowT[int]{}},
 			0,
 		},
 		{
-			Table{ &RowT[int]{1, 2, 3} },
+			Table{&RowT[int]{1, 2, 3}},
 			3,
 		},
 		{
@@ -121,7 +121,7 @@ func TestTableLen(t *testing.T) {
 			3,
 		},
 	}
-	
+
 	for _, c := range cases {
 		expected := c.result
 		actual := c.table.Len()
@@ -132,7 +132,7 @@ func TestTableLen(t *testing.T) {
 }
 
 func TestTableSwap(t *testing.T) {
-	cases := []struct{
+	cases := []struct {
 		i, j   int
 		table  Table
 		result Table
@@ -144,13 +144,13 @@ func TestTableSwap(t *testing.T) {
 		},
 		{
 			0, 0,
-			Table{ &RowT[int]{1} },
-			Table{ &RowT[int]{1} },
+			Table{&RowT[int]{1}},
+			Table{&RowT[int]{1}},
 		},
 		{
 			1, 3,
-			Table{ &RowT[int]{1, 2, 3, 4} },
-			Table{ &RowT[int]{1, 4, 3, 2} },
+			Table{&RowT[int]{1, 2, 3, 4}},
+			Table{&RowT[int]{1, 4, 3, 2}},
 		},
 		{
 			2, 0,
@@ -164,7 +164,7 @@ func TestTableSwap(t *testing.T) {
 			},
 		},
 	}
-	
+
 	for _, c := range cases {
 		expected := c.result
 		c.table.Swap(c.i, c.j)
@@ -176,7 +176,7 @@ func TestTableSwap(t *testing.T) {
 }
 
 func TestTableDelete(t *testing.T) {
-	cases := []struct{
+	cases := []struct {
 		i      int
 		table  Table
 		result Table
@@ -220,7 +220,7 @@ func TestTableDelete(t *testing.T) {
 			},
 		},
 	}
-	
+
 	for _, c := range cases {
 		expected := c.result
 		c.table.Delete(c.i)

@@ -4,7 +4,7 @@ type Row interface {
 	Len() int
 	Swap(i, j int)
 	Delete(i int)
-	Append(t any)
+	Append(items ...any)
 }
 
 /*
@@ -26,15 +26,18 @@ func (s *RowT[T]) Delete(i int) {
 	*s = (*s)[:len(*s)-1]
 }
 
-func (s *RowT[T]) Append(t any) {
-	i, ok := t.(T)
+func (s *RowT[T]) Append(items ...any) {
+	if len(items) != 1 {
+		panic("Num items != 1")
+	}
+
+	item, ok := items[0].(T)
 	if !ok {
 		panic("wrong type")
 	}
 
-	*s = append(*s, i)
+	*s = append(*s, item)
 }
-
 
 /*
  * A table is a collection of rows which are all controlled simultaneously.
@@ -72,18 +75,58 @@ func (t Table) Filter(f func(int) bool) {
 	}
 }
 
-
 /*
  * A keymap is a device which returns integer keys when allocating elements in a table.
  * Provided the table state has not been modified by other functions, the keys can be used to
  * always retrieve the same associated elements even when the table columns have been reordered
  * due to calls to Append()/Delete().
  */
+type Key int
+
 type KeyMap struct {
-    Table *Table
-    KeyToIndex []int
+	Row        Row
+	KeyToIndex []int
 }
 
 func (k *KeyMap) Len() int {
-    return k.Table.Len()
+	return k.Row.Len()
+}
+
+func (k *KeyMap) Append(items ...any) Key {
+	for i := range k.KeyToIndex {
+		if k.KeyToIndex[i] < 0 { // use empty slot
+			k.KeyToIndex[i] = k.Row.Len()
+			k.Row.Append(items)
+			return Key(i)
+		}
+	}
+
+	// allocate new slot
+	index := k.Row.Len()
+	key := len(k.KeyToIndex)
+	k.Row.Append(items)
+	k.KeyToIndex = append(k.KeyToIndex, index)
+	return Key(key)
+}
+
+func (k *KeyMap) Delete(key Key) {
+	index := k.KeyToIndex[key]
+
+	end := k.Row.Len() - 1
+	if index != end { // swap row elements
+		for i := range k.KeyToIndex {
+			if k.KeyToIndex[i] == end {
+				k.KeyToIndex[i] = index
+				break
+			}
+		}
+	}
+
+	k.Row.Delete(index)
+
+	if key == Key(len(k.KeyToIndex)-1) { // key points to end element
+		k.KeyToIndex = k.KeyToIndex[:len(k.KeyToIndex)-1]
+	} else {
+		k.KeyToIndex[key] = -1
+	}
 }

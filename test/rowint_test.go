@@ -1,26 +1,26 @@
 package dataTest
 
 import (
-	"testing"
 	"github.com/tadeuszjt/data"
+	"testing"
 )
 
 func rowIntIdentical(a, b data.RowT[int]) bool {
 	if len(a) != len(b) {
 		return false
 	}
-	
+
 	for i := range a {
 		if a[i] != b[i] {
 			return false
 		}
 	}
-	
+
 	return true
 }
 
 func TestRowIntIdentical(t *testing.T) {
-	cases := []struct{
+	cases := []struct {
 		a, b   data.RowT[int]
 		result bool
 	}{
@@ -45,7 +45,7 @@ func TestRowIntIdentical(t *testing.T) {
 			false,
 		},
 	}
-	
+
 	for _, c := range cases {
 		expected := c.result
 		actual := rowIntIdentical(c.a, c.b)
@@ -56,15 +56,15 @@ func TestRowIntIdentical(t *testing.T) {
 }
 
 func TestRowIntLen(t *testing.T) {
-	cases := []struct{
-		row  data.RowT[int]
+	cases := []struct {
+		row    data.RowT[int]
 		result int
 	}{
 		{data.RowT[int]{}, 0},
 		{data.RowT[int]{1, 2, 3}, 3},
 		{nil, 0},
 	}
-	
+
 	for _, c := range cases {
 		expected := c.result
 		actual := c.row.Len()
@@ -75,9 +75,9 @@ func TestRowIntLen(t *testing.T) {
 }
 
 func TestRowIntSwap(t *testing.T) {
-	cases := []struct{
+	cases := []struct {
 		i, j   int
-		row  data.RowT[int]
+		row    data.RowT[int]
 		result data.RowT[int]
 	}{
 		{0, 0, data.RowT[int]{1}, data.RowT[int]{1}},
@@ -86,7 +86,7 @@ func TestRowIntSwap(t *testing.T) {
 		{1, 2, data.RowT[int]{1, 2, 3, 4}, data.RowT[int]{1, 3, 2, 4}},
 		{3, 0, data.RowT[int]{1, 2, 3, 4}, data.RowT[int]{4, 2, 3, 1}},
 	}
-	
+
 	for _, c := range cases {
 		expected := c.result
 		c.row.Swap(c.i, c.j)
@@ -98,9 +98,9 @@ func TestRowIntSwap(t *testing.T) {
 }
 
 func TestRowIntDelete(t *testing.T) {
-	cases := []struct{
+	cases := []struct {
 		i      int
-		row  data.RowT[int]
+		row    data.RowT[int]
 		result data.RowT[int]
 	}{
 		{0, data.RowT[int]{1}, data.RowT[int]{}},
@@ -109,7 +109,7 @@ func TestRowIntDelete(t *testing.T) {
 		{3, data.RowT[int]{1, 2, 3, 4}, data.RowT[int]{1, 2, 3}},
 		{0, data.RowT[int]{1, 2, 3, 4}, data.RowT[int]{4, 2, 3}},
 	}
-	
+
 	for _, c := range cases {
 		expected := c.result
 		c.row.Delete(c.i)

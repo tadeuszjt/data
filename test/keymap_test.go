@@ -1,54 +1,63 @@
 package dataTest
 
 import (
-	"testing"
 	. "github.com/tadeuszjt/data"
+	"testing"
 )
 
 func keyMapIdentical(a, b KeyMap) bool {
 	if len(a.KeyToIndex) != len(b.KeyToIndex) {
 		return false
 	}
-    for i := range a.KeyToIndex {
-        if a.KeyToIndex[i] != b.KeyToIndex[i] {
-            return false
-        }
-    }
-	
-	return tableIdentical(*a.Table, *b.Table)
+	for i := range a.KeyToIndex {
+		if a.KeyToIndex[i] != b.KeyToIndex[i] {
+			return false
+		}
+	}
+
+	aRow, ok := a.Row.(*RowT[int])
+	if !ok {
+		panic("!ok")
+	}
+
+	bRow, ok := b.Row.(*RowT[int])
+	if !ok {
+		panic("!ok")
+	}
+
+	return rowIntIdentical(*aRow, *bRow)
 }
 
-
 func TestKeyMapLen(t *testing.T) {
-	cases := []struct{
+	cases := []struct {
 		km     KeyMap
 		result int
 	}{
 		{
-            KeyMap {
-                &Table{ &RowT[int]{} },
-                []int{},
-            },
-            0,
+			KeyMap{
+				&Table{&RowT[int]{}},
+				[]int{},
+			},
+			0,
 		},
 		{
-            KeyMap {
-                &Table{ &RowT[int]{ 1, 2, 3 } },
-                []int{},
-            },
-            3,
+			KeyMap{
+				&Table{&RowT[int]{1, 2, 3}},
+				[]int{},
+			},
+			3,
 		},
 		{
-            KeyMap {
-                &Table{
-                    &RowT[int]{ 1, 2, 3, 4},
-                    &RowT[float32]{3, 4, 5, 6}},
-                []int{1, 2, 3},
-            },
-            4,
+			KeyMap{
+				&Table{
+					&RowT[int]{1, 2, 3, 4},
+					&RowT[float32]{3, 4, 5, 6}},
+				[]int{1, 2, 3},
+			},
+			4,
 		},
 	}
-	
+
 	for _, c := range cases {
 		expected := c.result
 		actual := c.km.Len()
@@ -77,7 +86,7 @@ func TestKeyMapLen(t *testing.T) {
 //            },
 //		},
 //	}
-//	
+//
 //	for _, c := range cases {
 //        c.km.Swap(c.i, c.j)
 //
