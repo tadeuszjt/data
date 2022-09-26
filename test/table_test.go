@@ -12,20 +12,20 @@ func tableIdentical(a, b Table) bool {
 	
 	for i := range a {
 		switch sa := a[i].(type) {
-			case *SliceT[int]:
-				sb, ok := b[i].(*SliceT[int])
-				if !ok || !sliceIntIdentical(*sa, *sb) {
+			case *RowT[int]:
+				sb, ok := b[i].(*RowT[int])
+				if !ok || !rowIntIdentical(*sa, *sb) {
 					return false
 				}
 				
-			case *SliceT[float32]:
-				sb, ok := b[i].(*SliceT[float32])
-				if !ok || !sliceFloat32Identical(*sa, *sb) {
+			case *RowT[float32]:
+				sb, ok := b[i].(*RowT[float32])
+				if !ok || !rowFloat32Identical(*sa, *sb) {
 					return false
 				}
 				
 			default:
-				panic("testSliceIntIdentical: unrecognised slice type")
+				panic("testRowIntIdentical: unrecognised row type")
 		}
 	}
 	
@@ -44,48 +44,48 @@ func TestTableIdentical(t *testing.T) {
 		},
 		{
 			Table{},
-			Table{ &SliceT[int]{} },
+			Table{ &RowT[int]{} },
 			false,
 		},
 		{
-			Table{ &SliceT[int]{} },
-			Table{ &SliceT[int]{} },
+			Table{ &RowT[int]{} },
+			Table{ &RowT[int]{} },
 			true,
 		},
 		{
-			Table{ &SliceT[float32]{} },
-			Table{ &SliceT[int]{} },
+			Table{ &RowT[float32]{} },
+			Table{ &RowT[int]{} },
 			false,
 		},
 		{
-			Table{ &SliceT[int]{1, 2, 3} },
-			Table{ &SliceT[int]{1, 2, 3} },
+			Table{ &RowT[int]{1, 2, 3} },
+			Table{ &RowT[int]{1, 2, 3} },
 			true,
 		},
 		{
-			Table{ &SliceT[int]{1, 2, 3} },
-			Table{ &SliceT[int]{1, 2, 4} },
+			Table{ &RowT[int]{1, 2, 3} },
+			Table{ &RowT[int]{1, 2, 4} },
 			false,
 		},
 		{
 			Table{
-				&SliceT[int]{1, 2, 3},
-				&SliceT[float32]{1, 2, 3},
+				&RowT[int]{1, 2, 3},
+				&RowT[float32]{1, 2, 3},
 			},
 			Table{
-				&SliceT[int]{1, 2, 3},
-				&SliceT[float32]{1, 2, 3},
+				&RowT[int]{1, 2, 3},
+				&RowT[float32]{1, 2, 3},
 			},
 			true,
 		},
 		{
 			Table{
-				&SliceT[int]{1, 2, 3},
-				&SliceT[float32]{1, 2, 3},
+				&RowT[int]{1, 2, 3},
+				&RowT[float32]{1, 2, 3},
 			},
 			Table{
-				&SliceT[int]{1, 2, 3},
-				&SliceT[float32]{1, 2, 3.1},
+				&RowT[int]{1, 2, 3},
+				&RowT[float32]{1, 2, 3.1},
 			},
 			false,
 		},
@@ -106,17 +106,17 @@ func TestTableLen(t *testing.T) {
 		result int
 	}{
 		{
-			Table{ &SliceT[int]{} },
+			Table{ &RowT[int]{} },
 			0,
 		},
 		{
-			Table{ &SliceT[int]{1, 2, 3} },
+			Table{ &RowT[int]{1, 2, 3} },
 			3,
 		},
 		{
 			Table{
-				&SliceT[int]{1, 2, 3},
-				&SliceT[float32]{1, 2, 3},
+				&RowT[int]{1, 2, 3},
+				&RowT[float32]{1, 2, 3},
 			},
 			3,
 		},
@@ -144,23 +144,23 @@ func TestTableSwap(t *testing.T) {
 		},
 		{
 			0, 0,
-			Table{ &SliceT[int]{1} },
-			Table{ &SliceT[int]{1} },
+			Table{ &RowT[int]{1} },
+			Table{ &RowT[int]{1} },
 		},
 		{
 			1, 3,
-			Table{ &SliceT[int]{1, 2, 3, 4} },
-			Table{ &SliceT[int]{1, 4, 3, 2} },
+			Table{ &RowT[int]{1, 2, 3, 4} },
+			Table{ &RowT[int]{1, 4, 3, 2} },
 		},
 		{
 			2, 0,
 			Table{
-				&SliceT[int]{1, 2, 3, 4},
-				&SliceT[float32]{.1, .2, .3, .4},
+				&RowT[int]{1, 2, 3, 4},
+				&RowT[float32]{.1, .2, .3, .4},
 			},
 			Table{
-				&SliceT[int]{3, 2, 1, 4},
-				&SliceT[float32]{.3, .2, .1, .4},
+				&RowT[int]{3, 2, 1, 4},
+				&RowT[float32]{.3, .2, .1, .4},
 			},
 		},
 	}
@@ -189,34 +189,34 @@ func TestTableDelete(t *testing.T) {
 		{
 			0,
 			Table{
-				&SliceT[int]{1, 2, 3, 4},
-				&SliceT[float32]{1, 2, 3, 4},
+				&RowT[int]{1, 2, 3, 4},
+				&RowT[float32]{1, 2, 3, 4},
 			},
 			Table{
-				&SliceT[int]{4, 2, 3},
-				&SliceT[float32]{4, 2, 3},
+				&RowT[int]{4, 2, 3},
+				&RowT[float32]{4, 2, 3},
 			},
 		},
 		{
 			1,
 			Table{
-				&SliceT[int]{1, 2, 3, 4},
-				&SliceT[float32]{1, 2, 3, 4},
+				&RowT[int]{1, 2, 3, 4},
+				&RowT[float32]{1, 2, 3, 4},
 			},
 			Table{
-				&SliceT[int]{1, 4, 3},
-				&SliceT[float32]{1, 4, 3},
+				&RowT[int]{1, 4, 3},
+				&RowT[float32]{1, 4, 3},
 			},
 		},
 		{
 			3,
 			Table{
-				&SliceT[int]{1, 2, 3, 4},
-				&SliceT[float32]{1, 2, 3, 4},
+				&RowT[int]{1, 2, 3, 4},
+				&RowT[float32]{1, 2, 3, 4},
 			},
 			Table{
-				&SliceT[int]{1, 2, 3},
-				&SliceT[float32]{1, 2, 3},
+				&RowT[int]{1, 2, 3},
+				&RowT[float32]{1, 2, 3},
 			},
 		},
 	}
