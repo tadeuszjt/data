@@ -136,3 +136,55 @@ func TestKeyMapAppend(t *testing.T) {
 		}
 	}
 }
+func TestKeyMapDelete(t *testing.T) {
+	cases := []struct {
+        keyMap KeyMap
+        key    Key
+		result KeyMap
+	}{
+		{
+			KeyMap{
+				&RowT[int]{1},
+				[]int{0},
+			},
+            Key(0),
+			KeyMap{
+				&RowT[int]{},
+				[]int{},
+			},
+		},
+		{
+			KeyMap{
+				&RowT[int]{1, 2},
+				[]int{0, 1},
+			},
+            Key(0),
+			KeyMap{
+				&RowT[int]{2},
+				[]int{-1, 0},
+			},
+		},
+		{
+			KeyMap{
+				&RowT[int]{1, 2},
+				[]int{0, 1},
+			},
+            Key(1),
+			KeyMap{
+				&RowT[int]{1},
+				[]int{0},
+			},
+		},
+	}
+
+	for _, c := range cases {
+		expected := c.result
+        c.keyMap.Delete(c.key)
+		actual := c.keyMap
+
+		if !keyMapIdentical(expected, actual) {
+			t.Errorf("expected: %v, actual: %v", expected, actual)
+		}
+	}
+}
+
