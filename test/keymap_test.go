@@ -35,22 +35,22 @@ func TestKeyMapLen(t *testing.T) {
 	}{
 		{
 			KeyMap{
-				&RowT[int]{},
-				[]int{},
+				Row:        &RowT[int]{},
+				KeyToIndex: []int{},
 			},
 			0,
 		},
 		{
 			KeyMap{
-				&RowT[int]{1, 2, 3},
-				[]int{},
+				Row:        &RowT[int]{1, 2, 3},
+				KeyToIndex: []int{},
 			},
 			3,
 		},
 		{
 			KeyMap{
-				&RowT[int]{1, 2, 3, 4},
-				[]int{1, 2, 3},
+				Row:        &RowT[int]{1, 2, 3, 4},
+				KeyToIndex: []int{1, 2, 3},
 			},
 			4,
 		},
@@ -74,52 +74,25 @@ func TestKeyMapAppend(t *testing.T) {
 		ret    Key
 	}{
 		{
-			KeyMap{
-				&RowT[int]{},
-				[]int{},
-			},
+			MakeKeyMap(&RowT[int]{}),
 			[]any{1},
 			KeyMap{
-				&RowT[int]{1},
-				[]int{0},
+				Row:        &RowT[int]{1},
+				KeyToIndex: []int{0},
 			},
 			Key(0),
 		},
 		{
 			KeyMap{
-				&RowT[int]{},
-				[]int{-1},
-			},
-			[]any{2},
-			KeyMap{
-				&RowT[int]{2},
-				[]int{0},
-			},
-			Key(0),
-		},
-		{
-			KeyMap{
-				&RowT[int]{1, 2, 3},
-				[]int{1, 0},
+				Row:        &RowT[int]{1, 2, 3},
+				KeyToIndex: []int{1, 0},
 			},
 			[]any{5},
 			KeyMap{
-				&RowT[int]{1, 2, 3, 5},
-				[]int{1, 0, 3},
+				Row:        &RowT[int]{1, 2, 3, 5},
+				KeyToIndex: []int{1, 0, 3},
 			},
 			Key(2),
-		},
-		{
-			KeyMap{
-				&RowT[int]{1, 2, 3},
-				[]int{1, -1},
-			},
-			[]any{5},
-			KeyMap{
-				&RowT[int]{1, 2, 3, 5},
-				[]int{1, 3},
-			},
-			Key(1),
 		},
 	}
 
@@ -138,48 +111,48 @@ func TestKeyMapAppend(t *testing.T) {
 }
 func TestKeyMapDelete(t *testing.T) {
 	cases := []struct {
-        keyMap KeyMap
-        key    Key
+		keyMap KeyMap
+		key    Key
 		result KeyMap
 	}{
 		{
 			KeyMap{
-				&RowT[int]{1},
-				[]int{0},
+				Row:        &RowT[int]{1},
+				KeyToIndex: []int{0},
 			},
-            Key(0),
+			Key(0),
 			KeyMap{
-				&RowT[int]{},
-				[]int{},
-			},
-		},
-		{
-			KeyMap{
-				&RowT[int]{1, 2},
-				[]int{0, 1},
-			},
-            Key(0),
-			KeyMap{
-				&RowT[int]{2},
-				[]int{-1, 0},
+				Row:        &RowT[int]{},
+				KeyToIndex: []int{},
 			},
 		},
 		{
 			KeyMap{
-				&RowT[int]{1, 2},
-				[]int{0, 1},
+				Row:        &RowT[int]{1, 2},
+				KeyToIndex: []int{0, 1},
 			},
-            Key(1),
+			Key(0),
 			KeyMap{
-				&RowT[int]{1},
-				[]int{0},
+				Row:        &RowT[int]{2},
+				KeyToIndex: []int{-1, 0},
+			},
+		},
+		{
+			KeyMap{
+				Row:        &RowT[int]{1, 2},
+				KeyToIndex: []int{0, 1},
+			},
+			Key(1),
+			KeyMap{
+				Row:        &RowT[int]{1},
+				KeyToIndex: []int{0},
 			},
 		},
 	}
 
 	for _, c := range cases {
 		expected := c.result
-        c.keyMap.Delete(c.key)
+		c.keyMap.Delete(c.key)
 		actual := c.keyMap
 
 		if !keyMapIdentical(expected, actual) {
@@ -187,4 +160,3 @@ func TestKeyMapDelete(t *testing.T) {
 		}
 	}
 }
-

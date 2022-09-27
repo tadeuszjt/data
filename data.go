@@ -86,6 +86,11 @@ type Key int
 type KeyMap struct {
 	Row        Row
 	KeyToIndex []int
+	unusedKeys []Key
+}
+
+func MakeKeyMap(row Row) KeyMap {
+	return KeyMap{Row: row}
 }
 
 func (k *KeyMap) Len() int {
@@ -93,12 +98,12 @@ func (k *KeyMap) Len() int {
 }
 
 func (k *KeyMap) Append(items ...any) Key {
-	for i := range k.KeyToIndex {
-		if k.KeyToIndex[i] < 0 { // use empty slot
-			k.KeyToIndex[i] = k.Row.Len()
-			k.Row.Append(items...)
-			return Key(i)
-		}
+	if len(k.unusedKeys) > 0 { // use empty slot
+		key := k.unusedKeys[len(k.unusedKeys)-1]
+		k.unusedKeys = k.unusedKeys[:len(k.unusedKeys)-1]
+		k.KeyToIndex[key] = k.Row.Len()
+		k.Row.Append(items...)
+		return key
 	}
 
 	// allocate new slot
@@ -128,5 +133,6 @@ func (k *KeyMap) Delete(key Key) {
 		k.KeyToIndex = k.KeyToIndex[:len(k.KeyToIndex)-1]
 	} else {
 		k.KeyToIndex[key] = -1
+		k.unusedKeys = append(k.unusedKeys, key)
 	}
 }
