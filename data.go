@@ -96,7 +96,7 @@ func (k *KeyMap) Append(items ...any) Key {
 	for i := range k.KeyToIndex {
 		if k.KeyToIndex[i] < 0 { // use empty slot
 			k.KeyToIndex[i] = k.Row.Len()
-			k.Row.Append(items)
+			k.Row.Append(items...)
 			return Key(i)
 		}
 	}
@@ -104,7 +104,7 @@ func (k *KeyMap) Append(items ...any) Key {
 	// allocate new slot
 	index := k.Row.Len()
 	key := len(k.KeyToIndex)
-	k.Row.Append(items)
+	k.Row.Append(items...)
 	k.KeyToIndex = append(k.KeyToIndex, index)
 	return Key(key)
 }

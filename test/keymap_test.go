@@ -35,23 +35,21 @@ func TestKeyMapLen(t *testing.T) {
 	}{
 		{
 			KeyMap{
-				&Table{&RowT[int]{}},
+				&RowT[int]{},
 				[]int{},
 			},
 			0,
 		},
 		{
 			KeyMap{
-				&Table{&RowT[int]{1, 2, 3}},
+				&RowT[int]{1, 2, 3},
 				[]int{},
 			},
 			3,
 		},
 		{
 			KeyMap{
-				&Table{
-					&RowT[int]{1, 2, 3, 4},
-					&RowT[float32]{3, 4, 5, 6}},
+				&RowT[int]{1, 2, 3, 4},
 				[]int{1, 2, 3},
 			},
 			4,
@@ -68,30 +66,73 @@ func TestKeyMapLen(t *testing.T) {
 	}
 }
 
-//func TestKeyMapSwap(t *testing.T) {
-//	cases := []struct{
-//        i, j   int
-//		km     KeyMap
-//		result KeyMap
-//	}{
-//		{
-//            0, 0,
-//            KeyMap {
-//                &Table{ &RowT[int]{} },
-//                []int{},
-//            },
-//            KeyMap {
-//                &Table{ &RowT[int]{} },
-//                []int{},
-//            },
-//		},
-//	}
-//
-//	for _, c := range cases {
-//        c.km.Swap(c.i, c.j)
-//
-//		if !keyMapIdentical(c.km, c.result) {
-//			t.Errorf("expected: %v, actual: %v", c.result, c.km)
-//		}
-//	}
-//}
+func TestKeyMapAppend(t *testing.T) {
+	cases := []struct {
+		keyMap KeyMap
+		items  []any
+		result KeyMap
+		ret    Key
+	}{
+		{
+			KeyMap{
+				&RowT[int]{},
+				[]int{},
+			},
+			[]any{1},
+			KeyMap{
+				&RowT[int]{1},
+				[]int{0},
+			},
+			Key(0),
+		},
+		{
+			KeyMap{
+				&RowT[int]{},
+				[]int{-1},
+			},
+			[]any{2},
+			KeyMap{
+				&RowT[int]{2},
+				[]int{0},
+			},
+			Key(0),
+		},
+		{
+			KeyMap{
+				&RowT[int]{1, 2, 3},
+				[]int{1, 0},
+			},
+			[]any{5},
+			KeyMap{
+				&RowT[int]{1, 2, 3, 5},
+				[]int{1, 0, 3},
+			},
+			Key(2),
+		},
+		{
+			KeyMap{
+				&RowT[int]{1, 2, 3},
+				[]int{1, -1},
+			},
+			[]any{5},
+			KeyMap{
+				&RowT[int]{1, 2, 3, 5},
+				[]int{1, 3},
+			},
+			Key(1),
+		},
+	}
+
+	for _, c := range cases {
+		expected := c.result
+		ret := c.keyMap.Append(c.items...)
+		actual := c.keyMap
+
+		if !keyMapIdentical(expected, actual) {
+			t.Errorf("expected: %v, actual: %v", expected, actual)
+		}
+		if ret != c.ret {
+			t.Errorf("ret: expected: %v, actual: %v", c.ret, ret)
+		}
+	}
+}
