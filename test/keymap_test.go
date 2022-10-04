@@ -5,6 +5,12 @@ import (
 	"testing"
 )
 
+func CheckEqual[T ~int | ~bool](t *testing.T, expected, actual T) {
+	if expected != actual {
+		t.Errorf("expected: %v, actual: %v", expected, actual)
+	}
+}
+
 func keyMapIdentical(a, b KeyMap) bool {
 	if len(a.KeyToIndex) != len(b.KeyToIndex) {
 		return false
@@ -69,13 +75,13 @@ func TestKeyMapLen(t *testing.T) {
 func TestKeyMapAppend(t *testing.T) {
 	cases := []struct {
 		keyMap KeyMap
-		items  []any
+		item   any
 		result KeyMap
 		ret    Key
 	}{
 		{
 			MakeKeyMap(&RowT[int]{}),
-			[]any{1},
+			1,
 			KeyMap{
 				Row:        &RowT[int]{1},
 				KeyToIndex: []int{0},
@@ -87,7 +93,7 @@ func TestKeyMapAppend(t *testing.T) {
 				Row:        &RowT[int]{1, 2, 3},
 				KeyToIndex: []int{1, 0},
 			},
-			[]any{5},
+			5,
 			KeyMap{
 				Row:        &RowT[int]{1, 2, 3, 5},
 				KeyToIndex: []int{1, 0, 3},
@@ -98,7 +104,7 @@ func TestKeyMapAppend(t *testing.T) {
 
 	for _, c := range cases {
 		expected := c.result
-		ret := c.keyMap.Append(c.items...)
+		ret := c.keyMap.Append(c.item)
 		actual := c.keyMap
 
 		if !keyMapIdentical(expected, actual) {
@@ -109,6 +115,87 @@ func TestKeyMapAppend(t *testing.T) {
 		}
 	}
 }
+
+func TestKeyMapDeleteAppend(t *testing.T) {
+	row := RowT[int]{}
+	keyMap := MakeKeyMap(&row)
+
+	key0 := keyMap.Append(0)
+	key1 := keyMap.Append(1)
+	key2 := keyMap.Append(2)
+
+	CheckEqual(t, 0, key0)
+	CheckEqual(t, 1, key1)
+	CheckEqual(t, 2, key2)
+	CheckEqual(t, 3, keyMap.Len())
+	CheckEqual(t, 0, row[0])
+	CheckEqual(t, 1, row[1])
+	CheckEqual(t, 2, row[2])
+
+	// Row       : [0, 1, 2]
+	// KeyToIndex: [0, 1, 2]
+	// unusedKeys: []
+
+	keyMap.Delete(key2)
+	CheckEqual(t, 2, keyMap.Len())
+	CheckEqual(t, 0, keyMap.KeyToIndex[key0])
+	CheckEqual(t, 1, keyMap.KeyToIndex[key1])
+	CheckEqual(t, 0, row[0])
+	CheckEqual(t, 1, row[1])
+
+	// Row       : [0, 1]
+	// KeyToIndex: [0, 1]
+	// unusedKeys: []
+
+	key2 = keyMap.Append(2)
+	CheckEqual(t, 3, keyMap.Len())
+	CheckEqual(t, 0, keyMap.KeyToIndex[key0])
+	CheckEqual(t, 1, keyMap.KeyToIndex[key1])
+	CheckEqual(t, 2, keyMap.KeyToIndex[key2])
+	CheckEqual(t, 0, row[0])
+	CheckEqual(t, 1, row[1])
+	CheckEqual(t, 2, row[2])
+
+	// Row       : [0, 1, 2]
+	// KeyToIndex: [0, 1, 2]
+	// unusedKeys: []
+
+	keyMap.Delete(key1)
+	CheckEqual(t, 2, keyMap.Len())
+	CheckEqual(t, 0, keyMap.KeyToIndex[key0])
+	CheckEqual(t, -1, keyMap.KeyToIndex[key1])
+	CheckEqual(t, 1, keyMap.KeyToIndex[key2])
+	CheckEqual(t, 0, row[0])
+	CheckEqual(t, 2, row[1])
+
+	// Row       : [0, 2]
+	// KeyToIndex: [0, -1, 2]
+	// unusedKeys: [1]
+
+	keyMap.Delete(key2)
+	CheckEqual(t, 1, keyMap.Len())
+	CheckEqual(t, 0, keyMap.KeyToIndex[key0])
+	CheckEqual(t, -1, keyMap.KeyToIndex[key1])
+	CheckEqual(t, 0, row[0])
+	CheckEqual(t, 2, len(keyMap.KeyToIndex))
+
+	// Row       : [0]
+	// KeyToIndex: [0, -1]
+	// unusedKeys: [1]
+
+	key1 = keyMap.Append(1)
+	CheckEqual(t, 2, keyMap.Len())
+	CheckEqual(t, 0, keyMap.KeyToIndex[key0])
+	CheckEqual(t, 1, keyMap.KeyToIndex[key1])
+	CheckEqual(t, 0, row[0])
+	CheckEqual(t, 1, row[1])
+	CheckEqual(t, 2, len(keyMap.KeyToIndex))
+
+	// Row       : [0, 1]
+	// KeyToIndex: [0, 1]
+	// unusedKeys: []
+}
+
 func TestKeyMapDelete(t *testing.T) {
 	cases := []struct {
 		keyMap KeyMap

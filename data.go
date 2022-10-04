@@ -1,5 +1,9 @@
 package data
 
+const (
+	KeyInvalid = Key(-1)
+)
+
 type Row interface {
 	Len() int
 	Swap(i, j int)
@@ -85,12 +89,19 @@ type Key int
 
 type KeyMap struct {
 	Row        Row
-	KeyToIndex []int
-	unusedKeys []Key
+	KeyToIndex RowT[int]
+	unusedKeys RowT[Key]
 }
 
 func MakeKeyMap(row Row) KeyMap {
 	return KeyMap{Row: row}
+}
+
+func (k *KeyMap) GetIndex(key Key) int {
+	if key < 0 || key > Key(len(k.KeyToIndex)-1) || k.KeyToIndex[key] < 0 || k.KeyToIndex[key] > k.Row.Len() {
+		panic("invalid key")
+	}
+	return k.KeyToIndex[key]
 }
 
 func (k *KeyMap) Len() int {
@@ -98,9 +109,10 @@ func (k *KeyMap) Len() int {
 }
 
 func (k *KeyMap) Append(items ...any) Key {
-	if len(k.unusedKeys) > 0 { // use empty slot
-		key := k.unusedKeys[len(k.unusedKeys)-1]
-		k.unusedKeys = k.unusedKeys[:len(k.unusedKeys)-1]
+	if k.unusedKeys.Len() > 0 { // use empty slot
+		key := k.unusedKeys[k.unusedKeys.Len()-1]
+		k.unusedKeys.Delete(k.unusedKeys.Len() - 1)
+
 		k.KeyToIndex[key] = k.Row.Len()
 		k.Row.Append(items...)
 		return key
@@ -108,14 +120,14 @@ func (k *KeyMap) Append(items ...any) Key {
 
 	// allocate new slot
 	index := k.Row.Len()
-	key := len(k.KeyToIndex)
+	key := k.KeyToIndex.Len()
 	k.Row.Append(items...)
-	k.KeyToIndex = append(k.KeyToIndex, index)
+	k.KeyToIndex.Append(index)
 	return Key(key)
 }
 
 func (k *KeyMap) Delete(key Key) {
-	index := k.KeyToIndex[key]
+	index := k.GetIndex(key)
 
 	end := k.Row.Len() - 1
 	if index != end { // swap row elements
@@ -129,10 +141,10 @@ func (k *KeyMap) Delete(key Key) {
 
 	k.Row.Delete(index)
 
-	if key == Key(len(k.KeyToIndex)-1) { // key points to end element
-		k.KeyToIndex = k.KeyToIndex[:len(k.KeyToIndex)-1]
+	if key == Key(k.KeyToIndex.Len()-1) { // key points to end element
+		k.KeyToIndex.Delete(k.KeyToIndex.Len() - 1)
 	} else {
 		k.KeyToIndex[key] = -1
-		k.unusedKeys = append(k.unusedKeys, key)
+		k.unusedKeys.Append(key)
 	}
 }
