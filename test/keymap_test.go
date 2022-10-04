@@ -12,9 +12,9 @@ func CheckEqual[T ~int | ~bool](t *testing.T, expected, actual T) {
 }
 
 func keyMapIdentical(a, b KeyMap) bool {
-    if a.Len() != b.Len() {
-        return false
-    }
+	if a.Len() != b.Len() {
+		return false
+	}
 
 	aRow, ok := a.Row.(*RowT[int])
 	if !ok {
@@ -34,9 +34,9 @@ func TestKeyMapLen(t *testing.T) {
 		km     KeyMap
 		result int
 	}{
-		{ MakeKeyMap(&RowT[int]{}), 0, },
-		{ MakeKeyMap(&RowT[int]{1, 2, 3}), 3, },
-		{ MakeKeyMap(&RowT[int]{1, 2, 3, 4}), 4, },
+		{MakeKeyMap(&RowT[int]{}), 0},
+		{MakeKeyMap(&RowT[int]{1, 2, 3}), 3},
+		{MakeKeyMap(&RowT[int]{1, 2, 3, 4}), 4},
 	}
 
 	for _, c := range cases {

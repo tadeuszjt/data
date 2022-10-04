@@ -4,6 +4,10 @@ const (
 	KeyInvalid = Key(-1)
 )
 
+var (
+	keyCount = 0
+)
+
 type Row interface {
 	Len() int
 	Swap(i, j int)
@@ -89,19 +93,24 @@ type Key int
 
 type KeyMap struct {
 	Row        Row
-	keyToIndex RowT[int]
-	unusedKeys RowT[Key]
+	keyToIndex map[Key]int
+	indexToKey map[int]Key
 }
 
 func MakeKeyMap(row Row) KeyMap {
-	return KeyMap{Row: row}
+	return KeyMap{
+		Row:        row,
+		keyToIndex: make(map[Key]int),
+		indexToKey: make(map[int]Key),
+	}
 }
 
 func (k *KeyMap) GetIndex(key Key) int {
-	if key < 0 || key > Key(len(k.keyToIndex)-1) || k.keyToIndex[key] < 0 || k.keyToIndex[key] > k.Row.Len() {
+	index, ok := k.keyToIndex[key]
+	if !ok || index < 0 || index >= k.Row.Len() {
 		panic("invalid key")
 	}
-	return k.keyToIndex[key]
+	return index
 }
 
 func (k *KeyMap) Len() int {
@@ -109,42 +118,29 @@ func (k *KeyMap) Len() int {
 }
 
 func (k *KeyMap) Append(items ...any) Key {
-	if k.unusedKeys.Len() > 0 { // use empty slot
-		key := k.unusedKeys[k.unusedKeys.Len()-1]
-		k.unusedKeys.Delete(k.unusedKeys.Len() - 1)
+	key := Key(keyCount)
+	keyCount++
 
-		k.keyToIndex[key] = k.Row.Len()
-		k.Row.Append(items...)
-		return key
-	}
-
-	// allocate new slot
 	index := k.Row.Len()
-	key := k.keyToIndex.Len()
 	k.Row.Append(items...)
-	k.keyToIndex.Append(index)
-	return Key(key)
+
+	k.keyToIndex[key] = index
+	k.indexToKey[index] = key
+
+	return key
 }
 
 func (k *KeyMap) Delete(key Key) {
 	index := k.GetIndex(key)
 
-	end := k.Row.Len() - 1
-	if index != end { // swap row elements
-		for i := range k.keyToIndex {
-			if k.keyToIndex[i] == end {
-				k.keyToIndex[i] = index
-				break
-			}
-		}
+	endKey, ok := k.indexToKey[k.Row.Len()-1]
+	if ok {
+		k.keyToIndex[endKey] = index
+		k.indexToKey[index] = endKey
 	}
+
+	delete(k.keyToIndex, key)
+	delete(k.indexToKey, k.Row.Len()-1)
 
 	k.Row.Delete(index)
-
-	if key == Key(k.keyToIndex.Len()-1) { // key points to end element
-		k.keyToIndex.Delete(k.keyToIndex.Len() - 1)
-	} else {
-		k.keyToIndex[key] = -1
-		k.unusedKeys.Append(key)
-	}
 }
